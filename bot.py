@@ -37,7 +37,7 @@ ytdl_format_options = {
     "no_warnings": True,
     "extract_flat": False,
     "cookiefile": "cookies.txt"
-
+}
 
 def get_ffmpeg_options(seek_seconds=0):
 
