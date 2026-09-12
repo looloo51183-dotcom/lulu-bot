@@ -29,7 +29,7 @@ bot = commands.Bot(
 # ==================================================
 
 ytdl_format_options = {
-    "format": "ba",
+    "format": "bestaudio/best",
     "noplaylist": True,
     "default_search": "auto",
     "source_address": "0.0.0.0",
