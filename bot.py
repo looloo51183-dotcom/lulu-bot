@@ -589,4 +589,4 @@ async def on_message(message):
 # تشغيل البوت
 # ==================================================
 
-bot.run(TOKEN)
+bot.run(os.getenv('TOKEN'))
