@@ -37,7 +37,7 @@ ytdl_format_options = {
     "no_warnings": True,
     "extract_flat": False,
     "cookiefile": "cookies.txt",
-}# ملف الكوكيز لتجاوز الحظر
+# ملف الكوكيز لتجاوز الحظر
 }
 
 
