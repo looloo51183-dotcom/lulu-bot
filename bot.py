@@ -1,4 +1,3 @@
-import os
 import discord
 from discord.ext import commands
 import yt_dlp
@@ -9,7 +8,7 @@ import coordinator
 # توكن البوت
 # ==================================================
 
-TOKEN = os.getenv("TOKEN")
+TOKEN = "MTU0NjEyODI5NDcxNjM3OTIwOA.G-VBG7.OzhalqMG8Lng36iWNf080cz-HToI57wgmK6GcA"
 
 
 # ==================================================
@@ -25,7 +24,7 @@ bot = commands.Bot(
 
 
 # ==================================================
-# إعدادات yt_dlp مع الكوكيز لتجاوز حظر يوتيوب
+# إعدادات yt_dlp
 # ==================================================
 
 ytdl_format_options = {
@@ -33,11 +32,9 @@ ytdl_format_options = {
     "noplaylist": True,
     "default_search": "auto",
     "source_address": "0.0.0.0",
-    "ignoreerrors": True,
-    "no_warnings": True,
-    "extract_flat": False,
-    "cookiefile": "cookies.txt"
 }
+
+
 def get_ffmpeg_options(seek_seconds=0):
 
     opts = "-vn"
@@ -202,7 +199,7 @@ async def on_voice_state_update(
 
 
 # ==================================================
-# استقبال الرسائل
+# استقبال الرسائل (هنا تم التعديل لمنع التداخل)
 # ==================================================
 
 @bot.event
@@ -310,7 +307,7 @@ async def on_message(message):
 
 
     # ==================================================
-    # 2 - إيقاف أو تخطي الأغنية (سكب) عبر "س" أو "s"
+    # 2 - إيقاف الأغنية
     # ==================================================
 
     if (
@@ -318,11 +315,15 @@ async def on_message(message):
         or content_lower == "s"
     ):
 
+        # إذا البوت مو موجود مع الشخص بنفس الروم
+        # يتجاهل الأمر
         if not is_my_voice_channel(message):
 
             return
 
+
         voice = message.guild.voice_client
+
 
         if voice and voice.is_playing():
 
@@ -337,41 +338,14 @@ async def on_message(message):
             ] = 0
 
             await message.channel.send(
-                "⏭️ تم تخطي الأغنية!"
+                "⏹️"
             )
 
         return
 
 
     # ==================================================
-    # 3 - تقديم الأغنية عبر "قد"
-    # ==================================================
-
-    if content == "قد":
-
-        if not is_my_voice_channel(message):
-
-            return
-
-        voice = message.guild.voice_client
-
-        if voice and voice.is_playing():
-
-            await message.channel.send(
-                "⏩ جاري تقديم الأغنية..."
-            )
-
-        else:
-
-            await message.channel.send(
-                "مافي أغنية شغالة حالياً!"
-            )
-
-        return
-
-
-    # ==================================================
-    # 4 - مسح الشات
+    # 3 - مسح الشات
     # ==================================================
 
     if (
@@ -400,17 +374,21 @@ async def on_message(message):
 
 
     # ==================================================
-    # 5 - التحكم بالصوت
+    # 4 - التحكم بالصوت
     # مثال: v70
     # ==================================================
 
     if content_lower.startswith("v"):
 
+        # لا يستجيب إلا للشخص الموجود
+        # مع هذا البوت بنفس الروم
         if not is_my_voice_channel(message):
 
             return
 
+
         voice = message.guild.voice_client
+
 
         if voice and voice.source:
 
@@ -419,6 +397,7 @@ async def on_message(message):
                 vol = int(
                     content[1:].strip()
                 )
+
 
                 if 0 <= vol <= 200:
 
@@ -436,11 +415,13 @@ async def on_message(message):
                         "حط رقم بين 0 و 200"
                     )
 
+
             except ValueError:
 
                 await message.channel.send(
                     "اكتب كذا: v70"
                 )
+
 
         else:
 
@@ -452,7 +433,7 @@ async def on_message(message):
 
 
     # ==================================================
-    # 6 - تشغيل أغنية
+    # 5 - تشغيل أغنية
     # ش اسم الأغنية
     # p اسم الأغنية
     # ==================================================
@@ -462,6 +443,8 @@ async def on_message(message):
         or content_lower.startswith("p ")
     ):
 
+        # إذا البوت موجود في روم ثاني
+        # ما يتدخل بأمر هذا الشخص
         if (
             message.guild.voice_client
             and not is_my_voice_channel(message)
@@ -469,12 +452,16 @@ async def on_message(message):
 
             return
 
+
         query = content[2:].strip()
+
 
         if not query:
 
             return
 
+
+        # لازم الشخص يكون في روم صوتي
         if not message.author.voice:
 
             await message.channel.send(
@@ -483,9 +470,16 @@ async def on_message(message):
 
             return
 
+
         channel = message.author.voice.channel
 
         voice = message.guild.voice_client
+
+
+        # ==================================================
+        # إذا البوت مو داخل أي روم
+        # يدخل روم الشخص
+        # ==================================================
 
         if not voice:
 
@@ -495,9 +489,11 @@ async def on_message(message):
                 bot.user.id
             )
 
+
             if not claimed:
 
                 return
+
 
             try:
 
@@ -517,15 +513,28 @@ async def on_message(message):
 
                 return
 
+
+        # ==================================================
+        # حماية إضافية
+        # تأكد أن البوت في نفس روم الشخص
+        # ==================================================
+
         if voice.channel.id != channel.id:
 
             return
 
+
+        # حفظ حالة التشغيل
         state = guild_playback_state[guild_id]
 
         state["current_url"] = query
 
         state["current_position"] = 0
+
+
+        # ==================================================
+        # استخراج وتشغيل الأغنية
+        # ==================================================
 
         async with message.channel.typing():
 
@@ -538,9 +547,12 @@ async def on_message(message):
                     seek_time=0
                 )
 
+
+                # إذا فيه أغنية شغالة
                 if voice.is_playing():
 
                     voice.stop()
+
 
                 voice.play(
                     player,
@@ -551,9 +563,11 @@ async def on_message(message):
                     if e else None
                 )
 
+
                 await message.channel.send(
                     f"🎶 **{player.title}**"
                 )
+
 
             except Exception as e:
 
