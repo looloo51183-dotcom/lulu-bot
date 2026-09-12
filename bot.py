@@ -29,16 +29,14 @@ bot = commands.Bot(
 # ==================================================
 
 ytdl_format_options = {
-    "format": "ba/best",
+    "format": "bestaudio/best",
     "noplaylist": True,
     "default_search": "auto",
     "source_address": "0.0.0.0",
     "ignoreerrors": True,
     "no_warnings": True,
     "extract_flat": False,
-    "cookiefile": "cookies.txt",
-# ملف الكوكيز لتجاوز الحظر
-}
+    "cookiefile": "cookies.txt"
 
 
 def get_ffmpeg_options(seek_seconds=0):
