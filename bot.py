@@ -29,7 +29,7 @@ bot = commands.Bot(
 # ==================================================
 
 ytdl_format_options = {
-    "format": "bestaudio/best",
+    "format": "ba",
     "noplaylist": True,
     "default_search": "auto",
     "source_address": "0.0.0.0",
@@ -38,7 +38,6 @@ ytdl_format_options = {
     "extract_flat": False,
     "cookiefile": "cookies.txt"
 }
-
 def get_ffmpeg_options(seek_seconds=0):
 
     opts = "-vn"
